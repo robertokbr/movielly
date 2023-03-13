@@ -7,7 +7,6 @@ export const sessionMiddleware = (
   next: NextFunction
 ) => {
   const token = request.headers.authorization.split(' ')[1];
-  console.log(token);
   if (!token) {
     return response.status(401).json({ message: 'No auth token sent!' });
   }
@@ -16,7 +15,6 @@ export const sessionMiddleware = (
     request['user'] = decoded;
     next();
   } catch (error) {
-    console.error(error);
     return response.status(401).json({ message: 'Unauthorized' });
   }
 }
