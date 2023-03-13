@@ -13,7 +13,6 @@ export const sessionMiddleware = (
   }
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decoded);
     request['user'] = decoded;
     next();
   } catch (error) {
