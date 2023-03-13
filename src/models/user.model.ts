@@ -5,6 +5,8 @@ export class User {
 
   username: string;
 
+  password: string;
+
   constructor(data: Omit<User, 'id'>) {
     const id = randomBytes(16).toString('hex');
     Object.assign(this, { id: id, ...data });

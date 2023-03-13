@@ -1,15 +1,23 @@
 import jwt from 'jsonwebtoken';
+import { Request, Response, NextFunction } from 'express';
 
-export const sessionMiddleware = (req, res, next) => {
-  const token = req.headers.authorization;
+export const sessionMiddleware = (
+  request: Request,
+  response: Response,
+  next: NextFunction
+) => {
+  const token = request.headers.authorization.split(' ')[1];
+  console.log(token);
   if (!token) {
-    return res.status(401).json({ message: 'Unauthorized' });
+    return response.status(401).json({ message: 'No auth token sent!' });
   }
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
+    console.log(decoded);
+    request['user'] = decoded;
     next();
   } catch (error) {
-    return res.status(401).json({ message: 'Unauthorized' });
+    console.error(error);
+    return response.status(401).json({ message: 'Unauthorized' });
   }
 }
