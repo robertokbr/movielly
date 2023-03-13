@@ -1,0 +1,11 @@
+{
+  "name": "movielly",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:robertokbr/movielly.git",
+  "author": "robertokbr <robertojuniordev@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript":  "^4.9.5"
+  }
+}
