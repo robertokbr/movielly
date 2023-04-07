@@ -6,6 +6,7 @@ export interface DBConnection {
   users: {
     create: (user: User) => Promise<void>;
     findOne: (username: string) => Promise<User | undefined>;
+    findById: (id: string) => Promise<User | undefined>;
     list: () => Promise<User[]>;
   };
   reviews: {
@@ -15,6 +16,7 @@ export interface DBConnection {
 }
 
 class Database {
+  private isConnected = false;
   // Simulate a database
   private users: User[] = [];
   private reviews: Review[] = [];
@@ -24,11 +26,16 @@ class Database {
 
   // Simulate a database connection
   public async connect(): Promise<void> {
+    this.isConnected = true;
     console.info('database connection established ✅');
     return Promise.resolve();
   }
 
   public getConnection(): DBConnection {
+    if (!this.isConnected) {
+      throw new Error("Database is not connected!");
+    }
+
     return {
       isConnected: true,
       users: {
@@ -39,6 +46,9 @@ class Database {
         },
         findOne: async (username: string) => {
           return this.usersByUsername.get(username);
+        },
+        findById: async (id: string) => {
+          return this.usersById.get(id);
         },
         list: async () => {
           return this.users;

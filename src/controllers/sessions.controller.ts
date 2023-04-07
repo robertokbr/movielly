@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { DBConnection } from '../database';
+import { CreateSessionUsecase } from '../usecases/create-session.usecase';
 
 export class SessionsController {
   constructor(private readonly dbconnection: DBConnection) {}
@@ -12,38 +13,18 @@ export class SessionsController {
       password
     } = request.body;
 
-    const user = await this.dbconnection.users.findOne(username);
-
-    if (!user) {
-      return response.status(404).json({
-        message: 'User not found',
-        statusCode: 404,
-      })
-    }
-
-    const isPasswordMatching = await bcrypt.compare(
-      password,
-      user.password,
+    const createSessionUsecase = new CreateSessionUsecase(
+      this.dbconnection,
     );
 
-    if (!isPasswordMatching) {
-      return response.status(401).json({
-        message: 'Invalid password',
-        statusCode: 401,
-      })
-    }
-
-    const token = jwt.sign(
-      { username: user.username },
-      process.env.JWT_SECRET,
-      { expiresIn: '1d' },
+    const res = await createSessionUsecase.execute(
+      username,
+      password
     );
-
-    delete user.password;
 
     return response.status(201).json({
-      token,
-      user,
+      token: res.token,
+      user: res.user,
     });
   }
 }

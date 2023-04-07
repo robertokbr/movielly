@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { DBConnection } from '../database';
-import { User } from '../models/user.model';
-import bcrypt from 'bcrypt';
+import { CreateUserUsecaseExecute } from '../usecases/create-user.usecase';
 export class UsersController {
   constructor(private readonly dbconnection: DBConnection) {}
 
@@ -11,23 +10,7 @@ export class UsersController {
       password,
     } = request.body;
 
-    const userWithSameUsername = await this.dbconnection.users.findOne(username);
-
-    if (userWithSameUsername) {
-      return response.status(409).json({
-        message: 'User already exists',
-        statusCode: 409,
-      });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = new User({
-      username,
-      password: hashedPassword,
-    });
-
-    await this.dbconnection.users.create(user);
+    await CreateUserUsecaseExecute(username, password, this.dbconnection);
 
     return response.status(201).json({
       message: 'User created successfully',
@@ -37,6 +20,16 @@ export class UsersController {
 
   public list = async (_: Request, response: Response): Promise<Response> => {
     const users = await this.dbconnection.users.list();
-    return response.status(200).json(users);
+
+    const serializedUsers = users.map(user => {
+      const {
+        id,
+        username
+      } = user;
+
+      return { id, username };
+    })
+
+    return response.status(200).json(serializedUsers);
   }
 }

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { DBConnection } from '../database';
 import { Review } from '../models/review.model';
+import { CreateReviewUsecase } from '../usecases/create-review.usecase';
 
 export class ReviewsController {
   constructor(private readonly dbconnection: DBConnection) {}
@@ -15,15 +16,15 @@ export class ReviewsController {
 
     const userId = request['user'].id;
 
-    const review = new Review({
+    const createReviewUsecase = new CreateReviewUsecase(this.dbconnection);
+
+    await createReviewUsecase.execute({
       movie,
       comment,
       rating,
-      userId,
       imageUrl,
-    });
-
-    await this.dbconnection.reviews.create(review);
+      userId,
+    })
 
     return response.status(201).json({
       message: 'Review created successfully',

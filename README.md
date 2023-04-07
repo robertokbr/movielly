@@ -1,6 +1,5 @@
 # Movielly
-Uma API para criar e compartilhar seu feedback sobre seus filmes favoritos! 
-
+Uma API para criar e compartilhar seu feedback sobre seus filmes favoritos!
 
 ## Como rodar a API
 > Para rodar esta api, é necessário que você tenha installado em seu computador o Node.JS.
@@ -9,16 +8,18 @@ Uma API para criar e compartilhar seu feedback sobre seus filmes favoritos!
 * Instalar os pacotes
 ```bash
 	npm install
-``` 
+
+  yarn
+```
 
 * Rodar o app
 
 ```bash
-	npm run start:dev
+	npm run dev
+
+  yarn dev
 ```
 
 * Importar o arquivo do insomnia no app.
 
 > Pronto! Agora você pode testar a API o quanto quiser.
-
-
