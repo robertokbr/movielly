@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { DBConnection } from '../database';
-import { CreateUserUsecaseExecute } from '../usecases/create-user.usecase';
+import { CreateUserUsecase } from '../usecases/create-user.usecase';
 export class UsersController {
   constructor(private readonly dbconnection: DBConnection) {}
 
@@ -10,7 +10,9 @@ export class UsersController {
       password,
     } = request.body;
 
-    await CreateUserUsecaseExecute(username, password, this.dbconnection);
+    const createUserUsecaseExecute = new CreateUserUsecase(this.dbconnection);
+
+    await createUserUsecaseExecute.execute({username, password});
 
     return response.status(201).json({
       message: 'User created successfully',

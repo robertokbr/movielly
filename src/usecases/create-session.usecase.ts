@@ -5,13 +5,7 @@ import { UnauthorizedError } from "../errors/unauthorized.ero";
 import { bcrypt } from "../utils/bcrypt";
 
 export class CreateSessionUsecase {
-  private dbConnection: DBConnection;
-
-  constructor(
-    dbConnection: DBConnection,
-  ) {
-    this.dbConnection = dbConnection;
-  }
+  constructor(private dbConnection: DBConnection){}
 
   public async execute(username: string, password: string) {
     const user = await this.dbConnection.users.findOne(username);

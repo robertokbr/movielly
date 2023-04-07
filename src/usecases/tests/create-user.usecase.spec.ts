@@ -1,6 +1,6 @@
 import { NotFoundError } from '../../errors/not-found.error';
 import { User } from '../../models/user.model';
-import { CreateUserUsecaseExecute } from '../create-user.usecase';
+import { CreateUserUsecase } from '../create-user.usecase';
 
 async function findOne(_: string) {
   return null;
@@ -21,7 +21,11 @@ const mockDBConnection = {
 
 describe("UsersController", () => {
   it("deve ser capaz de criar um usuario", async () => {
-    const user = await CreateUserUsecaseExecute('claudinho', 'senha123', mockDBConnection);
+    const createUserUsecase = new CreateUserUsecase(mockDBConnection);
+    const user = await createUserUsecase.execute({
+      username: 'claudinho',
+      password: 'senha123',
+    });
 
     expect((user as User).username).toBe('claudinho');
   });
@@ -33,8 +37,13 @@ describe("UsersController", () => {
       }
     };
 
+    const createUserUsecase = new CreateUserUsecase(mockDBConnection);
+
     await expect(
-      CreateUserUsecaseExecute('claudinho', 'senha123', mockDBConnection)
+      createUserUsecase.execute({
+        username: 'claudinho',
+        password: 'senha123',
+      }),
     ).rejects.toBeInstanceOf(NotFoundError)
   });
 })
