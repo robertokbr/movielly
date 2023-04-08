@@ -1,5 +1,5 @@
 import 'express-async-errors';
-import express, { NextFunction } from 'express';
+import express from 'express';
 import cors from 'cors';
 import { routes } from './routes';
 import { errorsMiddleware } from './middlewares/errors.middleware';
