@@ -1,8 +1,12 @@
 import { Request, Response } from 'express';
-import { DBConnection } from '../database';
-import { CreateUserUsecaseExecute } from '../usecases/create-user.usecase';
+import { CreateUserUsecase } from '../usecases/create-user.usecase';
+import { UsersRepositoryInterface } from '../interfaces/users-repository.interface';
+import { ReviewsRepositoryInterface } from '../interfaces/reviews-repository.interface';
 export class UsersController {
-  constructor(private readonly dbconnection: DBConnection) {}
+  constructor(
+    private readonly usersRepository: UsersRepositoryInterface,
+  ) {}
+
 
   public create = async (request: Request, response: Response): Promise<Response> => {
     const {
@@ -10,7 +14,11 @@ export class UsersController {
       password,
     } = request.body;
 
-    await CreateUserUsecaseExecute(username, password, this.dbconnection);
+    const createUserUsecase = new CreateUserUsecase(
+      this.usersRepository,
+    );
+
+    await createUserUsecase.execute({ username, password });
 
     return response.status(201).json({
       message: 'User created successfully',
@@ -19,7 +27,7 @@ export class UsersController {
   }
 
   public list = async (_: Request, response: Response): Promise<Response> => {
-    const users = await this.dbconnection.users.list();
+    const users = await this.usersRepository.list();
 
     const serializedUsers = users.map(user => {
       const {
