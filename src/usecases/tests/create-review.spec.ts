@@ -1,6 +1,9 @@
 import { ConflictError } from '../../errors/conflict.error';
 import { NotFoundError } from '../../errors/not-found.error';
+import { ReviewsRepositoryInterface } from '../../interfaces/reviews-repository.interface';
+import { UsersRepositoryInterface } from '../../interfaces/users-repository.interface';
 import { Review } from '../../models/review.model';
+import { User } from '../../models/user.model';
 import { CreateReviewUsecase } from '../create-review.usecase';
 
 const duplicatedMovieTitle = 'duplicate movie title';
@@ -13,7 +16,7 @@ async function findByIdUser(username: string) {
   return {
     username,
     password: 'password',
-  };
+  } as User;
 }
 
 async function createReview(_: Review) {
@@ -21,36 +24,34 @@ async function createReview(_: Review) {
 }
 
 async function listDuplicatedReview(_: { userId: string }) {
-  return [{ movie: duplicatedMovieTitle }];
+  return [{ movie: duplicatedMovieTitle }] as Review[];
 }
 
 async function listNull(data: { userId: string }) {
   return [];
 }
 
-const users = {
+const mockUsersRepository = {
   findById: findByIdUser,
-}
+} as UsersRepositoryInterface;
 
-const reviews = {
+const mockReviewsRepository = {
   create: createReview,
   list: listNull
-};
-
-const mockDBConnection = {
-  users,
-  reviews
-} as any;
+} as ReviewsRepositoryInterface;
 
 describe("CreateReviewUsecase", () => {
   beforeEach(() => {
-    mockDBConnection.users.findById = findByIdUser;
-    mockDBConnection.reviews.list = listNull;
+    mockUsersRepository.findById = findByIdUser;
+    mockReviewsRepository.list = listNull;
   });
 
   it("should be able to create a review", async () => {
-    mockDBConnection.users.findById = findByIdUser;
-    const createReviewUsecase = new CreateReviewUsecase(mockDBConnection);
+    mockUsersRepository.findById = findByIdUser;
+    const createReviewUsecase = new CreateReviewUsecase(
+      mockUsersRepository,
+      mockReviewsRepository,
+    );
     const createReviewParams = {
       comment: 'show',
       imageUrl: 'https://images/fotolegal.jpeg',
@@ -66,8 +67,11 @@ describe("CreateReviewUsecase", () => {
   });
 
   it("should not be able to create a review if the user not exists", async () => {
-    mockDBConnection.users.findById = findByIdNull;
-    const createReviewUsecase = new CreateReviewUsecase(mockDBConnection);
+    mockUsersRepository.findById = findByIdNull;
+    const createReviewUsecase = new CreateReviewUsecase(
+      mockUsersRepository,
+      mockReviewsRepository,
+    );
     const createReviewParams = {
       comment: 'show',
       imageUrl: 'https://images/fotolegal.jpeg',
@@ -80,9 +84,12 @@ describe("CreateReviewUsecase", () => {
   });
 
   it("should not be able to create a duplicated review", async () => {
-    mockDBConnection.users.findById = findByIdUser;
-    mockDBConnection.reviews.list = listDuplicatedReview;
-    const createReviewUsecase = new CreateReviewUsecase(mockDBConnection);
+    mockUsersRepository.findById = findByIdUser;
+    mockReviewsRepository.list = listDuplicatedReview;
+    const createReviewUsecase = new CreateReviewUsecase(
+      mockUsersRepository,
+      mockReviewsRepository,
+    );
 
     const createReviewParams = {
       comment: 'show',

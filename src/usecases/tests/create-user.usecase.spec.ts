@@ -1,8 +1,9 @@
 import { NotFoundError } from '../../errors/not-found.error';
+import { UsersRepositoryInterface } from '../../interfaces/users-repository.interface';
 import { User } from '../../models/user.model';
-import { CreateUserUsecaseExecute } from '../create-user.usecase';
+import { CreateUserUsecase } from '../create-user.usecase';
 
-async function findOne(_: string) {
+async function findByUsername(_: string) {
   return null;
 }
 
@@ -10,31 +11,31 @@ async function create(_: User) {
   return null;
 }
 
-const users = {
-  findOne,
+const mockUsersRepository = {
+  findByUsername,
   create
-}
-
-const mockDBConnection = {
-  users,
-} as any;
+} as UsersRepositoryInterface;
 
 describe("UsersController", () => {
   it("deve ser capaz de criar um usuario", async () => {
-    const user = await CreateUserUsecaseExecute('claudinho', 'senha123', mockDBConnection);
+    const createUserUsecase = new CreateUserUsecase(mockUsersRepository);
+
+    const user = await createUserUsecase.execute({ username: 'claudinho', password: 'senha123' });
 
     expect((user as User).username).toBe('claudinho');
   });
 
   it("should not be able to create an user if there is already a user with same username", async () => {
-    mockDBConnection.users.findOne = (username: string) => {
+    mockUsersRepository.findByUsername = async (username: string) => {
       return {
         username,
-      }
+      } as User
     };
 
+    const createUserUsecase = new CreateUserUsecase(mockUsersRepository);
+
     await expect(
-      CreateUserUsecaseExecute('claudinho', 'senha123', mockDBConnection)
+      createUserUsecase.execute({ username: 'claudinho', password: 'senha123' })
     ).rejects.toBeInstanceOf(NotFoundError)
   });
 })
