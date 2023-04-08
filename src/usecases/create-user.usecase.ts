@@ -1,23 +1,35 @@
-import { DBConnection } from "../database";
 import { User } from '../models/user.model';
 import bcrypt from 'bcrypt';
 import { NotFoundError } from "../errors/not-found.error";
+import { UsersRepositoryInterface } from "../interfaces/users-repository.interface";
 
-export async function CreateUserUsecaseExecute(username: string, password, dbconnection: DBConnection) {
-  const userWithSameUsername = await dbconnection.users.findOne(username);
+interface CreateUserUsecaseParams {
+  username: string;
+  password: string;
+}
 
-  if (userWithSameUsername) {
-    throw new NotFoundError('User already exists');
-  }
+export class CreateUserUsecase {
+  constructor(private readonly usersRepository: UsersRepositoryInterface) {}
 
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const user = new User({
+  public async execute({
     username,
-    password: hashedPassword,
-  });
+    password,
+  }: CreateUserUsecaseParams) {
+    const userWithSameUsername = await this.usersRepository.findByUsername(username);
 
-  await dbconnection.users.create(user);
+    if (userWithSameUsername) {
+      throw new NotFoundError('User already exists');
+    }
 
-  return user;
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = new User({
+      username,
+      password: hashedPassword,
+    });
+
+    await this.usersRepository.create(user);
+
+    return user;
+  }
 }

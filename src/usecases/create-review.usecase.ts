@@ -1,6 +1,7 @@
-import { DBConnection } from "../database";
 import { ConflictError } from "../errors/conflict.error";
 import { NotFoundError } from "../errors/not-found.error";
+import { ReviewsRepositoryInterface } from "../interfaces/reviews-repository.interface";
+import { UsersRepositoryInterface } from "../interfaces/users-repository.interface";
 import { Review } from "../models/review.model";
 
 interface CreateReviewUsecaseParams {
@@ -12,7 +13,10 @@ interface CreateReviewUsecaseParams {
 }
 
 export class CreateReviewUsecase {
-  constructor(private dbConnection: DBConnection) {}
+  constructor(
+    private readonly usersRepository: UsersRepositoryInterface,
+     private readonly reviewsRepository: ReviewsRepositoryInterface,
+  ) {}
 
   public async execute({
     comment,
@@ -21,7 +25,7 @@ export class CreateReviewUsecase {
     rating,
     userId
    }: CreateReviewUsecaseParams) {
-    const user = await this.dbConnection.users.findById(
+    const user = await this.usersRepository.findById(
       userId,
     );
 
@@ -35,7 +39,7 @@ export class CreateReviewUsecase {
       imageUrl,
     });
 
-    const myReviews = await this.dbConnection.reviews.list({
+    const myReviews = await this.reviewsRepository.list({
       userId,
     });
 
@@ -43,7 +47,7 @@ export class CreateReviewUsecase {
 
       if (sameMovieReview) throw new ConflictError('You have already created a review to this movie');
 
-    await this.dbConnection.reviews.create(review);
+    await this.reviewsRepository.create(review);
 
     return review;
   }

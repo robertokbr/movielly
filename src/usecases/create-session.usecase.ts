@@ -1,20 +1,24 @@
-import { DBConnection } from "../database";
 import jwt from 'jsonwebtoken';
 import { NotFoundError } from "../errors/not-found.error";
 import { UnauthorizedError } from "../errors/unauthorized.ero";
 import { bcrypt } from "../utils/bcrypt";
+import { UsersRepositoryInterface } from "../interfaces/users-repository.interface";
+
+interface CreateSessionUsecaseParams {
+  username: string;
+  password: string;
+}
 
 export class CreateSessionUsecase {
-  private dbConnection: DBConnection;
-
   constructor(
-    dbConnection: DBConnection,
-  ) {
-    this.dbConnection = dbConnection;
-  }
+    private readonly usersRepository: UsersRepositoryInterface,
+  ) {}
 
-  public async execute(username: string, password: string) {
-    const user = await this.dbConnection.users.findOne(username);
+  public async execute({
+    username,
+    password
+  }: CreateSessionUsecaseParams) {
+    const user = await this.usersRepository.findByUsername(username);
 
     if (!user) {
       throw new NotFoundError('User not found!');
