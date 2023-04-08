@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { CreateUserUsecase } from '../usecases/create-user.usecase';
 import { UsersRepositoryInterface } from '../interfaces/users-repository.interface';
-import { ReviewsRepositoryInterface } from '../interfaces/reviews-repository.interface';
 export class UsersController {
   constructor(
     private readonly usersRepository: UsersRepositoryInterface,
