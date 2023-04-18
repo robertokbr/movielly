@@ -7,7 +7,7 @@ Uma API para criar e compartilhar seu feedback sobre seus filmes favoritos!
 
 * Instalar os pacotes
 ```bash
-	npm install
+  npm install
     ou
   yarn
 ```
@@ -23,7 +23,7 @@ Uma API para criar e compartilhar seu feedback sobre seus filmes favoritos!
 * Rodar o app
 
 ```bash
-	npm run dev
+  npm run dev
     ou
   yarn dev
 ```
