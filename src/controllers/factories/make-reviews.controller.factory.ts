@@ -10,5 +10,4 @@ export const reviewsControllerFactory = {
     const reviewsRepository = new ReviewsPrismaRepository(prismaProvider);
     return new ReviewsController(usersRepository, reviewsRepository);
   }
-
 }

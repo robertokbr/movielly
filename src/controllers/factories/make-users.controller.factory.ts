@@ -8,5 +8,4 @@ export const usersControllerFactory = {
     const usersRepository = new UsersPrismaRepository(prismaProvider);
     return new UsersController(usersRepository);
   }
-
 }
